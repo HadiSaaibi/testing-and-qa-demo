@@ -1,7 +1,7 @@
 // Pure fee math for the library front desk.
 // items: [{ title, daysLate, dailyRate }]  (daysLate <= 0 means no fee)
 
-function round2(n) {
+export function round2(n) {
   return Math.round(n * 100) / 100;
 }
 

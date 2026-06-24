@@ -2,7 +2,7 @@
 // can hit it in-memory with Supertest; src/server.js opens the port.
 
 import express from "express";
-import { feesSubtotal, feesTotal } from "./fees.js";
+import { feesSubtotal, feesTotal, round2 } from "./fees.js";
 
 export function createApp() {
   const app = express();
@@ -14,10 +14,25 @@ export function createApp() {
   });
 
   // POST /checkout { items, code? } -> 200 { subtotal, waiver, total } | 400
-  // TODO(student): validate the body, else respond with feesSubtotal/feesTotal
-  // and waiver = subtotal - total.
   app.post("/checkout", (req, res) => {
-    res.status(501).json({ error: "TODO(student): implement POST /checkout" });
+    const { items, code } = req.body;
+
+    if (!Array.isArray(items)) {
+      return res.status(400).json({ error: "items must be an array" });
+    }
+    const itemsValid = items.every(
+      (item) =>
+        typeof item.daysLate === "number" && typeof item.dailyRate === "number"
+    );
+    if (!itemsValid) {
+      return res
+        .status(400)
+        .json({ error: "each item needs numeric daysLate and dailyRate" });
+    }
+
+    const subtotal = feesSubtotal(items);
+    const total = feesTotal(items, code);
+    res.json({ subtotal, waiver: round2(subtotal - total), total });
   });
 
   return app;
