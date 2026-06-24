@@ -23,6 +23,10 @@ describe("feesSubtotal (provided)", () => {
   it("never charges for on-time/early returns", () => {
     expect(feesSubtotal([{ daysLate: -2, dailyRate: 0.25 }])).toBe(0);
   });
+
+  it("throws when items is not an array", () => {
+    expect(() => feesSubtotal("nope")).toThrow(TypeError);
+  });
 });
 
 describe("applyWaiver (TODO)", () => {
